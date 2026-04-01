@@ -1,37 +1,59 @@
-# tackleza/node
+# node
 
 Docker Hub: https://hub.docker.com/r/tackleza/node
 
-A lightweight Node.js Docker image based on Alpine Linux, enhanced with additional development tools.
+A lightweight Node.js Docker image based on Alpine Linux, with **pnpm** pre-installed globally on all variants.
 
-This image is functionally identical to the official [`node`](https://hub.docker.com/_/node) image, but includes some extra software that is commonly needed in modern JavaScript/Node.js development environments.
+## Available Tags
+
+| Tag | Node.js Version |
+|-----|----------------|
+| `20-alpine` | Node.js 20 |
+| `21-alpine` | Node.js 21 |
+| `22-alpine` | Node.js 22 |
+| `23-alpine` | Node.js 23 |
+| `24-alpine` | Node.js 24 |
+| `25-alpine` | Node.js 25 |
+| `latest` | Node.js 25 |
+
+All images are based on the official `node:<version>-alpine` images.
 
 ## What's Included
 
-In addition to the official Node.js image features, this image includes:
-
-* pnpm – Fast, disk space efficient package manager
-
-*More tools will be added over time. This list will be updated accordingly.*
-
-## Base Image
-
-* `node:<version>-alpine` – Small, efficient, and secure Alpine Linux-based image
+- **pnpm** — Fast, disk space efficient package manager, installed globally on all variants
 
 ## Usage
 
-You can use this image just like the official Node.js image:
+### Basic example
 
-```bash
-# Example using pnpm
-FROM tackleza/node:20-alpine
+```dockerfile
+FROM tackleza/node:22-alpine
 
 WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
 COPY . .
-RUN pnpm install
 CMD ["node", "index.js"]
 ```
 
----
+### Run interactively
 
-Feel free to contribute or suggest more tools to be included!
+```bash
+docker run -it tackleza/node:22-alpine sh
+node --version
+pnpm --version
+```
+
+### With a volume for a project
+
+```bash
+docker run -it -v $(pwd):/app tackleza/node:22-alpine sh
+```
+
+## Why Use This Image?
+
+This image is functionally identical to the official [`node`](https://hub.docker.com/_/node) Alpine image, but with **pnpm** pre-installed so you don't need to install it in every layer.
+
+## Parent Image
+
+- [`node:<version>-alpine`](https://hub.docker.com/_/node) — Minimal Alpine Linux-based Node.js images
