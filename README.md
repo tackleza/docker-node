@@ -1,6 +1,7 @@
 # node
 
-Docker Hub: https://hub.docker.com/r/tackleza/node
+**GitHub:** https://github.com/tackleza/docker-node
+**Docker Hub:** https://hub.docker.com/r/tackleza/node
 
 A lightweight Node.js Docker image based on Alpine Linux, with **pnpm** pre-installed globally on all variants.
 
