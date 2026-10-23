@@ -15,6 +15,14 @@ COPY --from=native_build /usr/local/bin/node /usr/bin/node
 COPY --from=native_build /native/isolated-vm/build/Release/isolated_vm.node /usr/local/lib/node_modules/n8n/node_modules/.pnpm/isolated-vm@7.0.1/node_modules/isolated-vm/build/Release/isolated_vm.node
 COPY --from=native_build /native/kafka/Release/confluent-kafka-javascript.node /usr/local/lib/node_modules/n8n/node_modules/.pnpm/@confluentinc+kafka-javascript@1.9.1_patch_hash=c597d3e3d9d6d0d33588b7dc1e88d55f270ba15_602b6fdd5199747e8d909d98d456db49/node_modules/@confluentinc/kafka-javascript/build/Release/confluent-kafka-javascript.node
 USER root
+RUN rm -rf /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-editor-ui@file++++home+runner+_work+n8n+n8n+packages+frontend+editor-ui/node_modules/n8n-editor-ui/dist /usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+design-system@file++++home+runner+_work+n8n+n8n+packages+frontend+@n8n+design-system/node_modules/@n8n/design-system/dist /usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+mcp-apps@file++++home+runner+_work+n8n+n8n+packages+@n8n+mcp-apps/node_modules/@n8n/mcp-apps/dist/apps
+COPY frontend-artifacts/editor-dist/ /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-editor-ui@file++++home+runner+_work+n8n+n8n+packages+frontend+editor-ui/node_modules/n8n-editor-ui/dist/
+COPY frontend-artifacts/design-system-dist/ /usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+design-system@file++++home+runner+_work+n8n+n8n+packages+frontend+@n8n+design-system/node_modules/@n8n/design-system/dist/
+COPY frontend-artifacts/mcp-apps/ /usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+mcp-apps@file++++home+runner+_work+n8n+n8n+packages+@n8n+mcp-apps/node_modules/@n8n/mcp-apps/dist/apps/
+COPY frontend-artifacts/frontend-build-info.json /opt/n8n-security/frontend-build-info.json
+COPY frontend-source.patch /opt/n8n-security/frontend-source.patch
+COPY verify-frontend-artifacts.cjs /opt/n8n-security/verify-frontend-artifacts.cjs
+RUN node /opt/n8n-security/verify-frontend-artifacts.cjs
 COPY --from=security_dependencies /security/node_modules /opt/n8n-security/node_modules
 COPY security-dependencies/plan.json /opt/n8n-security/plan.json
 COPY security-dependencies/reviewed-major-transitions.json /opt/n8n-security/reviewed-major-transitions.json
@@ -29,4 +37,4 @@ RUN node /opt/n8n-security/compat-smoke.cjs
 COPY major-compat-smoke.cjs /opt/n8n-security/major-compat-smoke.cjs
 RUN node /opt/n8n-security/major-compat-smoke.cjs
 ARG N8N_SECURITY_REVISION=uncommitted
-LABEL security.patch.revision=$N8N_SECURITY_REVISION security.node.version=24.22.1 security.app.version=2.44.6
+LABEL security.patch.revision=$N8N_SECURITY_REVISION security.node.version=24.22.1 security.app.version=2.44.6 security.markdown.version=14.3.3 security.frontend.upstream=b58d9e89d60e9a3485bb511c5091d8be0d9511e4

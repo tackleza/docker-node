@@ -50,12 +50,38 @@ SHA-guarded and made optional for n8n's existing MongoDB6.11 collections. Both
 vendor driver constructors are tested without connecting to a database.
 These tests run without any real remote repository, database or mail service.
 
+## Editor Markdown rebuild
+
+The editor uses typography in its Markdown component. The release source also
+has a second Markdown13 dependency through `vue-markdown-render`. This recipe
+pins Markdown14.3.3 in both the catalog and the transitive override.
+
+`frontend-builder.Dockerfile` downloads n8n2.44.6 source commit
+`b58d9e89d60e9a3485bb511c5091d8be0d9511e4` from the official repository and
+checks the archive SHA256 before it applies `frontend-source.patch`.
+`build-frontend.sh` uses a separate Node24.22.1/pnpm12.4.2 container. It limits
+the build to6GB RAM and2CPU. Package builds and tests use one worker.
+
+The build retains the release public path and CSP nonce settings. It rebuilds
+the full editor, design-system and MCP preview assets. A Vite hook rejects any
+bundled Markdown input outside14.3.3. The final image removes the previous
+asset directories before copying the new outputs. It checks every installed
+asset against the recorded hashes. No minified file is patched in place.
+
+Renderer checks cover the existing Markdown/YouTube cases, chat plugins and
+the Vue wrapper. They also render384KB mixed-quote text with typography enabled.
+`browser-check.cjs` checks an isolated synthetic n8n instance in Chromium. It
+opens a workflow with that large sticky note, checks browser errors and compares
+the fetched Markdown chunk with the build manifest. The fixture has no real
+credentials or workflow data. Run it only against the named isolated fixture.
+
 ## Build and install
 
 Install this directory as `security-n8n2446/` beside the existing private
 n8n start/update scripts. Write the exact reviewed Git commit SHA to
 `source-revision.txt` after checking out that commit; the marker is generated
-release metadata, not a secret. Run `sh build-image.sh` before a cutover.
+release metadata, not a secret. Run `sh build-image.sh` before a cutover. This first rebuilds and checks the
+frontend in its bounded build container, then builds the maintained app image.
 The image is uniquely tagged with the source SHA and labelled with exact source,
 Node and app versions. Keep the existing private environment/config outside Git.
 
@@ -94,18 +120,16 @@ backups remain available separately.
 
 ## Remaining dependency work
 
-The stable app fixes its known first-party advisories, and the compatible
-runtime fixes reduce dependency findings substantially. This is not a claim
-that every vendor dependency is clean. The tested Git/argv-parser, TOML and Nodemailer fixes remove their current
-findings. Markdown still requires an editor rebuild/backport; Showdown has no
-newer upstream release fixing its reported issues. Precompiled editor
-assets require an editor rebuild/backport rather than a misleading runtime-only
-package replacement. stream-json3 removes the `stream-json/Assembler` subpath
-used by n8n core execution-data parsing; replacing it requires a reviewed core
-parser rewrite rather than an unsafe package overlay. Keep exact fresh findings in the operator release journal.
+The stable app and the tested Git, TOML, mail and Markdown changes clear their
+current findings. The installed graph still has7moderate package/advisory pairs.
+Element Plus link handling still needs a reviewed UI update. Showdown has no
+new fixed upstream release. stream-json3 removes `stream-json/Assembler`, which
+n8n uses to parse execution data. It needs a reviewed core parser rewrite or a
+compatible backport. Keep fresh exact findings in the release journal.
 
 Official sources:
 - https://github.com/n8n-io/n8n/releases/tag/n8n%402.44.6
 - https://docs.n8n.io/hosting/installation/updating/
 - https://www.postgresql.org/docs/release/18.6/
 - https://www.postgresql.org/support/security/CVE-2026-16239/
+- https://github.com/advisories/GHSA-r7fv-28h4-cvq7
