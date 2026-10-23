@@ -2,7 +2,7 @@
 
 This maintenance recipe keeps n8n on stable 2.44.6, replaces the official
 image's Node 26 Current runtime with patched Node 24.22.1 LTS, and applies
-reviewed same-major runtime dependency fixes. It does not publish shared tags.
+reviewed runtime dependency fixes, including explicitly tested major transitions. It does not publish shared tags.
 
 The vendor requires Node >=24. Node 22 is therefore no longer a valid runtime
 for this app version. Two V8 native bindings need attention when selecting LTS:
@@ -18,10 +18,37 @@ The test network has no outbound route or published ports; all copied workflows
 and webhook/pending execution triggers are disabled before app startup.
 
 `security-dependencies/package-lock.json` pins the isolated override tree.
-`relink-security.cjs` replaces only reviewed same-major package instances and
-records original/target versions inside the image. `compat-smoke.cjs` checks
+`relink-security.cjs` replaces pinned package instances and records original/target
+versions inside the image. Major transitions are rejected unless their original
+major and exact target appear in `reviewed-major-transitions.json`. `compat-smoke.cjs` checks
 mail streaming, multipart parsing, redirects, HTML/templates, date/query/IP
 helpers and an in-memory MCP tool roundtrip. No live notification is sent.
+
+## Reviewed dependency major transitions
+
+- `simple-git` 3 → 4.0.2 removes the critical argv/trailer issues. Version4
+  changes its CommonJS factory export and guards explicitly supplied Git
+  environment variables. `patch-compatibility.cjs` verifies both original n8n
+  consumer files by SHA256, adapts the Git node factory, and allows only the
+  exact environment keys already set by each consumer. Existing authentication,
+  path, protocol and config restrictions remain in place.
+- Nodemailer8 → 10.2.1 is checked through a UTF8/multipart/attachment MIME
+  roundtrip using n8n's actual mailparser. No email is sent.
+- TOML3 → 5.0.1 is checked through Snowflake SDK's actual connection-file
+  loader and normalizer, including null-prototype parsing and duplicate-key
+  rejection. Synthetic configuration contains no real account or key.
+
+`major-compat-smoke.cjs` invokes n8n's actual Git node against local repositories:
+status, add, commit, log, branch, tag, reflog, configuration, clone and pull.
+It verifies blocked paths/config/source arguments and the default refusal to
+push to a file remote. The simple-git4 local bare-repository push API and
+Promotions token/SSH setup are tested separately with synthetic credentials.
+LangChain MongoDB/Redis same-major fixes use mock collections/search clients to
+check session equality filters, query-injection rejection and filter escaping.
+LangChain MongoDB1.3.1 adds optional driver metadata; its new metadata call is
+SHA-guarded and made optional for n8n's existing MongoDB6.11 collections. Both
+vendor driver constructors are tested without connecting to a database.
+These tests run without any real remote repository, database or mail service.
 
 ## Build and install
 
@@ -69,11 +96,13 @@ backups remain available separately.
 
 The stable app fixes its known first-party advisories, and the compatible
 runtime fixes reduce dependency findings substantially. This is not a claim
-that every vendor dependency is clean. Git/argv-parser, TOML, Nodemailer and
-Markdown still require separate dependency-major compatibility work; Showdown
-has no newer upstream release fixing its reported issue. Precompiled editor
+that every vendor dependency is clean. The tested Git/argv-parser, TOML and Nodemailer fixes remove their current
+findings. Markdown still requires an editor rebuild/backport; Showdown has no
+newer upstream release fixing its reported issues. Precompiled editor
 assets require an editor rebuild/backport rather than a misleading runtime-only
-package replacement. Keep exact fresh findings in the operator release journal.
+package replacement. stream-json3 removes the `stream-json/Assembler` subpath
+used by n8n core execution-data parsing; replacing it requires a reviewed core
+parser rewrite rather than an unsafe package overlay. Keep exact fresh findings in the operator release journal.
 
 Official sources:
 - https://github.com/n8n-io/n8n/releases/tag/n8n%402.44.6

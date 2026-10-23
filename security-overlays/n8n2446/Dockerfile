@@ -17,12 +17,16 @@ COPY --from=native_build /native/kafka/Release/confluent-kafka-javascript.node /
 USER root
 COPY --from=security_dependencies /security/node_modules /opt/n8n-security/node_modules
 COPY security-dependencies/plan.json /opt/n8n-security/plan.json
+COPY security-dependencies/reviewed-major-transitions.json /opt/n8n-security/reviewed-major-transitions.json
+COPY patch-compatibility.cjs /opt/n8n-security/patch-compatibility.cjs
 COPY relink-security.cjs /opt/n8n-security/relink-security.cjs
-RUN node /opt/n8n-security/relink-security.cjs
+RUN node /opt/n8n-security/relink-security.cjs && N8N_GIT_CONSUMER_SHA=4f83e5249d7d69e796e2cc1ccf55d732ee429e14041623e4c55207693474eb44 node /opt/n8n-security/patch-compatibility.cjs
 USER node
 ENV NODE_VERSION=24.22.1 NODE_ICU_DATA=""
 RUN node --version && node -e 'require("/usr/local/lib/node_modules/n8n/node_modules/.pnpm/isolated-vm@7.0.1/node_modules/isolated-vm");require("/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@confluentinc+kafka-javascript@1.9.1_patch_hash=c597d3e3d9d6d0d33588b7dc1e88d55f270ba15_602b6fdd5199747e8d909d98d456db49/node_modules/@confluentinc/kafka-javascript");console.log("LTS native modules loaded")'
 COPY compat-smoke.cjs /opt/n8n-security/compat-smoke.cjs
 RUN node /opt/n8n-security/compat-smoke.cjs
+COPY major-compat-smoke.cjs /opt/n8n-security/major-compat-smoke.cjs
+RUN node /opt/n8n-security/major-compat-smoke.cjs
 ARG N8N_SECURITY_REVISION=uncommitted
 LABEL security.patch.revision=$N8N_SECURITY_REVISION security.node.version=24.22.1 security.app.version=2.44.6
