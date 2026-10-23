@@ -167,3 +167,12 @@ retained in the session's private operational report. Remaining high/moderate/
 low findings require follow-up; the image is not an audit-clean application.
 
 Legacy Apollo-fetch now resolves patched node-fetch2.7.0 for its previous1.7.3 copy. The actual client query/variables/response contract and cross-origin credential stripping are tested against disposable local servers. Localization/update/telemetry behavior is preserved; no real outbound job is triggered during clone tests.
+
+
+### Maintained upload-parser compatibility
+
+The legacy Apollo helper now resolves the maintained `@fastify/busboy`3.2.4 fork and `fs-capacitor`8.0.0. The pinned fork contains the upstream folded-header guard referenced by GHSA-wm7h-9275-46v2; published legacy Dicer versions remain affected. Both package paths and prior versions are guarded before replacement, and replacement symlinks retain original UID/GID. The image still runs as node.
+
+`verify-upload-compatibility.cjs` tests ordinary small single/multiple-file requests through the installed Apollo helper, including file metadata, bytes and request cleanup. fs-capacitor2's Writable.closed assignment is incompatible with Node24; the maintained implementation passes those checks. The application's schema does not reference Upload in any field, so Apollo2.26.2's implicit upload option leaves its multipart middleware disabled; that baseline behavior is preserved. Normal JSON GraphQL and actual REST uploads remain supported. No providers, settings or schema fields are enabled by this dependency update.
+
+The automated malformed/stress fixture was blocked and is not part of this release or its validation claims. Validation uses maintained upstream source/integrity, the fixed guard's presence, normal compatibility and isolated whole-application checks.

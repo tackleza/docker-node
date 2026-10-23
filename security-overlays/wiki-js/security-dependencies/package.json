@@ -26,6 +26,8 @@
     "path-to-regexp-v01": "npm:path-to-regexp@0.1.13",
     "apollo-server-v2": "npm:apollo-server@2.26.2",
     "apollo-server-express-v2": "npm:apollo-server-express@2.26.2",
-    "multer-v2": "npm:multer@2.5.0"
+    "multer-v2": "npm:multer@2.5.0",
+    "fastify-busboy": "npm:@fastify/busboy@3.2.4",
+    "fs-capacitor-v8": "npm:fs-capacitor@8.0.0"
   }
 }

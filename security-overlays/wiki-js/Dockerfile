@@ -14,7 +14,9 @@ RUN rm -rf /opt/wiki-security-deps/node_modules/graphql && ln -s /wiki/node_modu
     ln -s /wiki/node_modules/pug /opt/wiki-security-deps/node_modules/pug
 USER node
 COPY apply-compatible-replacements.cjs compatible-replacements.json /opt/wiki-security-deps/
+USER root
 RUN node /opt/wiki-security-deps/apply-compatible-replacements.cjs
+USER node
 
 # Scoped SAML requires the guarded certificate/callback adapter migration.
 COPY saml-authentication.js /wiki/server/modules/authentication/saml/authentication.js
