@@ -20,7 +20,7 @@ try:
  backup.chmod(0o600);d['backup_sha256']=hashlib.sha256(backup.read_bytes()).hexdigest();restore.mkdir(mode=0o700)
  run(['docker','run','--rm','--user','0','--entrypoint','tar','--mount',f'type=bind,source={root},target=/backup',image,'xzf','/backup/'+backup.name,'-C','/backup/'+restore.name])
  d['backup_restore_verified']=json.loads(run(['docker','run','--rm','--user','0','--entrypoint','node','--mount',f'type=bind,source={data},target=/source,readonly','--mount',f'type=bind,source={restore},target=/restore,readonly','--mount',f'type=bind,source={ops / "verify-tree.cjs"},target=/verify-tree.cjs,readonly',image,'/verify-tree.cjs','/source','/restore']))
- check=['docker','run','--rm','--user','0','--entrypoint','node','--mount',f'type=bind,source={restore},target=/restore,readonly','--mount',f'type=bind,source={ops / "kuma-protected-config.cjs"},target=/config-check.cjs,readonly',image,'/config-check.cjs','/restore/kuma.db']
+ check=['docker','run','--rm','--user','0','--entrypoint','node','--mount',f'type=bind,source={restore},target=/restore','--mount',f'type=bind,source={ops / "kuma-protected-config.cjs"},target=/config-check.cjs,readonly',image,'/config-check.cjs','/restore/kuma.db']
  d['protected_config_before']=json.loads(run(check));d['status']='cold_backup_verified';save()
  d['container_replacement']=json.loads(run(['python3',str(ops/'replace-bare-container.py'),name,image,expected_old,'--source-stopped-for-backup']));replaced=True;d['status']='candidate_started';save()
  for _ in range(90):

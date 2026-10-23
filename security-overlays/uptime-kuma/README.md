@@ -36,3 +36,14 @@ previous stopped container. No environment or credentials are logged. A failed
 acceptance restores the prior container without automatic live-data rollback.
 
 Source: https://github.com/louislam/uptime-kuma/releases/tag/2.5.7.
+
+The isolated restored SQLite directory must be writable for WAL/SHM initialization
+even though the connection is OPEN_READONLY with PRAGMA query_only enabled. Only
+the disposable restore mount is writable for this check; no production volume is
+mounted into the restore-check helper. Full WAL/SHM bytes are retained in the cold
+archive and validated before opening the restored database.
+
+`existing-monitor-compatibility.cjs` additionally exercises the application's real
+ICMP and TCP monitor helpers. Combined with the HTTP heartbeat test, this covers
+the types of all14 existing production monitors (5HTTP,8ping,1TCP) without calling
+their real targets or sending a real notification.
