@@ -11,3 +11,8 @@ RUN node --version && node -e "if(require('./package.json').version!=='2.5.316')
 COPY --from=security_dependencies /security-fixes/node_modules /opt/wiki-security-deps/node_modules
 COPY apply-compatible-replacements.cjs compatible-replacements.json /opt/wiki-security-deps/
 RUN node /opt/wiki-security-deps/apply-compatible-replacements.cjs
+
+# Scoped SAML requires the guarded certificate/callback adapter migration.
+COPY saml-authentication.js /wiki/server/modules/authentication/saml/authentication.js
+COPY apply-api-migrations.cjs /opt/wiki-security-deps/
+RUN node /opt/wiki-security-deps/apply-api-migrations.cjs
