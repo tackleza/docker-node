@@ -7,7 +7,7 @@ base/runtime image by immutable digest and record the resulting image ID.
 
 | Application | Retained version | Patched Node | Runtime source |
 |---|---|---|---|
-| Wiki.js | 2.5.314 | 24.22.1 | Official Node Alpine 3.23, matching vendor libc family |
+| Wiki.js | 2.5.316 | 24.22.1 | Official Node Alpine 3.24, matching maintained vendor image |
 | n8n | 2.7.5 | 22.23.4 | Official Node Alpine musl, tested on original DHI Alpine 3.22 |
 
 The n8n image retains its existing executable path under
@@ -58,3 +58,5 @@ Sources:
 - https://nodejs.org/en/blog/vulnerability/october-2026-security-releases
 - https://github.com/louislam/uptime-kuma/releases/tag/2.5.7
 - https://github.com/node-red/node-red/releases/tag/5.0.9
+
+Wiki.js application/PG maintenance and residual dependency risks are documented in [wiki-js/README.md](wiki-js/README.md).
