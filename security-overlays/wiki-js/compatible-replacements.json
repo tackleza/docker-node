@@ -201,5 +201,19 @@
     "target": "/opt/wiki-security-deps/node_modules/node-fetch-v2",
     "version": "2.7.0",
     "validatedMajorMigration": "real legacy Apollo-fetch client API and cross-origin credential stripping fixture"
+  },
+  {
+    "path": "/opt/wiki-security-deps/node_modules/busboy",
+    "expected": "0.3.1",
+    "target": "/opt/wiki-security-deps/node_modules/fastify-busboy",
+    "version": "3.2.4",
+    "validatedMajorMigration": "ordinary single/multiple-file Apollo upload-helper compatibility and maintained-parser inventory"
+  },
+  {
+    "path": "/opt/wiki-security-deps/node_modules/fs-capacitor",
+    "expected": "2.0.4",
+    "target": "/opt/wiki-security-deps/node_modules/fs-capacitor-v8",
+    "version": "8.0.0",
+    "validatedMajorMigration": "normal Apollo single/multiple-file buffering compatibility under Node24"
   }
 ]
