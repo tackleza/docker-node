@@ -9,6 +9,10 @@ FROM ghcr.io/requarks/wiki:2.5.316@sha256:fffff288a52f76e5b8c19a4fbcd0f3e538e96e
 COPY --from=node_runtime /usr/local/bin/node /usr/local/bin/node
 RUN node --version && node -e "if(require('./package.json').version!=='2.5.316')process.exit(1);for(const name of ['sqlite3','cpu-features','ssh2'])require(name)"
 COPY --from=security_dependencies /security-fixes/node_modules /opt/wiki-security-deps/node_modules
+USER root
+RUN rm -rf /opt/wiki-security-deps/node_modules/graphql && ln -s /wiki/node_modules/graphql /opt/wiki-security-deps/node_modules/graphql && \
+    ln -s /wiki/node_modules/pug /opt/wiki-security-deps/node_modules/pug
+USER node
 COPY apply-compatible-replacements.cjs compatible-replacements.json /opt/wiki-security-deps/
 RUN node /opt/wiki-security-deps/apply-compatible-replacements.cjs
 
@@ -16,3 +20,6 @@ RUN node /opt/wiki-security-deps/apply-compatible-replacements.cjs
 COPY saml-authentication.js /wiki/server/modules/authentication/saml/authentication.js
 COPY apply-api-migrations.cjs /opt/wiki-security-deps/
 RUN node /opt/wiki-security-deps/apply-api-migrations.cjs
+
+COPY apply-browser-security.cjs /opt/wiki-security-deps/
+RUN node --max-old-space-size=768 /opt/wiki-security-deps/apply-browser-security.cjs

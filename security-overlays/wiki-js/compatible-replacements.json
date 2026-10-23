@@ -55,5 +55,151 @@
     "target": "/opt/wiki-security-deps/node_modules/passport-saml-v5",
     "version": "5.1.1",
     "validatedMajorMigration": "Wiki SAML adapter signed login/logout/group and negative assertion fixtures"
+  },
+  {
+    "path": "/wiki/node_modules/body-parser",
+    "expected": "1.20.1",
+    "target": "/opt/wiki-security-deps/node_modules/body-parser-v1",
+    "version": "1.20.9"
+  },
+  {
+    "path": "/wiki/node_modules/compression",
+    "expected": "1.8.1",
+    "target": "/opt/wiki-security-deps/node_modules/compression-v1",
+    "version": "1.8.2"
+  },
+  {
+    "path": "/wiki/node_modules/mysql2",
+    "expected": "3.16.0",
+    "target": "/opt/wiki-security-deps/node_modules/mysql2-v3",
+    "version": "3.24.6"
+  },
+  {
+    "path": "/wiki/node_modules/http-cache-semantics",
+    "expected": "4.2.0",
+    "target": "/opt/wiki-security-deps/node_modules/http-cache-semantics-v4",
+    "version": "4.3.0"
+  },
+  {
+    "path": "/wiki/node_modules/dompurify",
+    "expected": "3.3.1",
+    "target": "/opt/wiki-security-deps/node_modules/dompurify-v3",
+    "version": "3.4.17"
+  },
+  {
+    "path": "/wiki/node_modules/express",
+    "expected": "4.18.2",
+    "target": "/opt/wiki-security-deps/node_modules/express-v4",
+    "version": "4.22.3"
+  },
+  {
+    "path": "/wiki/node_modules/path-to-regexp",
+    "expected": "0.1.7",
+    "target": "/opt/wiki-security-deps/node_modules/path-to-regexp-v01",
+    "version": "0.1.13"
+  },
+  {
+    "path": "/wiki/node_modules/cross-fetch/node_modules/node-fetch",
+    "expected": "2.6.1",
+    "target": "/opt/wiki-security-deps/node_modules/node-fetch-v2",
+    "version": "2.7.0"
+  },
+  {
+    "path": "/wiki/node_modules/immutable",
+    "expected": "3.7.6",
+    "target": "/opt/wiki-security-deps/node_modules/immutable-v3",
+    "version": "3.8.4"
+  },
+  {
+    "path": "/wiki/node_modules/lodash",
+    "expected": "4.17.21",
+    "target": "/opt/wiki-security-deps/node_modules/lodash-v4",
+    "version": "4.18.1"
+  },
+  {
+    "path": "/wiki/node_modules/@graphql-tools/url-loader/node_modules/node-fetch",
+    "expected": "2.6.1",
+    "target": "/opt/wiki-security-deps/node_modules/node-fetch-v2",
+    "version": "2.7.0"
+  },
+  {
+    "path": "/wiki/node_modules/isomorphic-ws/node_modules/ws",
+    "expected": "7.4.5",
+    "target": "/opt/wiki-security-deps/node_modules/ws-v7",
+    "version": "7.5.13"
+  },
+  {
+    "path": "/wiki/node_modules/@graphql-tools/url-loader/node_modules/ws",
+    "expected": "7.4.5",
+    "target": "/opt/wiki-security-deps/node_modules/ws-v7",
+    "version": "7.5.13"
+  },
+  {
+    "path": "/wiki/node_modules/i18next-node-fs-backend/node_modules/js-yaml",
+    "expected": "3.13.1",
+    "target": "/opt/wiki-security-deps/node_modules/js-yaml-v3",
+    "version": "3.15.2"
+  },
+  {
+    "path": "/wiki/node_modules/i18next-node-fs-backend/node_modules/json5",
+    "expected": "2.0.0",
+    "target": "/opt/wiki-security-deps/node_modules/json5-v2",
+    "version": "2.2.3"
+  },
+  {
+    "path": "/wiki/node_modules/js-yaml",
+    "expected": "3.14.0",
+    "target": "/opt/wiki-security-deps/node_modules/js-yaml-v3",
+    "version": "3.15.2"
+  },
+  {
+    "path": "/wiki/node_modules/luxon",
+    "expected": "1.25.0",
+    "target": "/opt/wiki-security-deps/node_modules/luxon-v1",
+    "version": "1.28.1"
+  },
+  {
+    "path": "/wiki/node_modules/nanoid",
+    "expected": "3.2.0",
+    "target": "/opt/wiki-security-deps/node_modules/nanoid-v3",
+    "version": "3.3.20"
+  },
+  {
+    "path": "/wiki/node_modules/node-uuid",
+    "expected": "1.4.1",
+    "target": "/opt/wiki-security-deps/node_modules/node-uuid-v1",
+    "version": "1.4.8"
+  },
+  {
+    "path": "/wiki/node_modules/tar-fs",
+    "expected": "2.1.1",
+    "target": "/opt/wiki-security-deps/node_modules/tar-fs-v2",
+    "version": "2.1.5"
+  },
+  {
+    "path": "/wiki/node_modules/apollo-server",
+    "expected": "2.25.2",
+    "target": "/opt/wiki-security-deps/node_modules/apollo-server-v2",
+    "version": "2.26.2"
+  },
+  {
+    "path": "/wiki/node_modules/apollo-server-express",
+    "expected": "2.25.2",
+    "target": "/opt/wiki-security-deps/node_modules/apollo-server-express-v2",
+    "version": "2.26.2"
+  },
+  {
+    "path": "/wiki/node_modules/multer",
+    "expected": "1.4.4",
+    "target": "/opt/wiki-security-deps/node_modules/multer-v2",
+    "version": "2.5.0",
+    "validatedMajorMigration": "actual Wiki upload route multipart and malformed request fixtures"
+  },
+  {
+    "path": "/wiki/node_modules/apollo-fetch/node_modules/node-fetch",
+    "expected": "1.7.3",
+    "target": "/opt/wiki-security-deps/node_modules/node-fetch-v2",
+    "version": "2.7.0",
+    "validatedMajorMigration": "real legacy Apollo-fetch client API and cross-origin credential stripping fixture"
   }
 ]
