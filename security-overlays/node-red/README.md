@@ -41,3 +41,25 @@ previous dependencies/image are restored without overwriting flows.
 
 Sources: https://github.com/advisories/GHSA-xq3m-2v4x-88gg and
 https://github.com/node-red/node-red/releases/tag/5.0.9.
+
+## Contended-disk rollout
+
+On a busy host use `../deploy-node-red-brief.py` instead of holding the app down
+for a full dependency-tree archive/restore. Its `prepare` phase runs while the
+original service remains available: restore and content/ownership/mode-check the
+immutable old dependency archive, pre-extract the candidate to a hidden stage,
+verify it against the immutable image, and revalidate the original lock. No
+concurrent palette installs are allowed. The archive is used only for immutable
+dependencies, not accepted as a final mutable-state snapshot.
+
+After the coordinator grants the stop gate, `cutover` revalidates image/lock and
+stage hashes, takes and restores a brief cold mutable-state archive, verifies all
+state content/ownership/modes, then atomically renames dependency paths and starts
+the candidate. The mutable archive excludes node_modules (separately verified),
+.npm/.cache (rebuildable) and .security-* staging/rollback directories. It includes
+flows, settings, encrypted credentials, context and other runtime data. Previous
+dependency directories remain untouched for immediate rollback.
+
+`../verify-tree-test.cjs` checks full restores, allowed state-only exclusions,
+protected flow tampering and permission differences. The original full-cold
+helper remains available for quiet hosts; do not retry an unknown execution.
