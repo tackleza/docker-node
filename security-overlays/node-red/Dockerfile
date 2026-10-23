@@ -4,7 +4,7 @@ USER root
 # use those exact patched bytes for npm's stale bundled copy as well.
 RUN test "$(node -p "require('/usr/src/node-red/node_modules/ip-address/package.json').version")" = 10.7.4 \
     && for target in /usr/src/node-red/node_modules/npm/node_modules/ip-address /usr/local/lib/node_modules/npm/node_modules/ip-address; do \
-         if [ -d "$target" ]; then rm -rf "$target" && cp -a /usr/src/node-red/node_modules/ip-address "$target"; fi; \
+         if [ -d "$target" ]; then owner=$(stat -c "%u:%g" "$target") && rm -rf "$target" && cp -a /usr/src/node-red/node_modules/ip-address "$target" && chown -R "$owner" "$target"; fi; \
        done
 RUN mkdir /opt/flow-dependencies && chown node-red:node-red /opt/flow-dependencies
 WORKDIR /opt/flow-dependencies
