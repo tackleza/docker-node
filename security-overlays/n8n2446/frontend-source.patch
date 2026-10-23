@@ -1,0 +1,197 @@
+diff --git a/packages/frontend/@n8n/design-system/src/components/N8nMarkdown/Markdown.rendering.test.ts b/packages/frontend/@n8n/design-system/src/components/N8nMarkdown/Markdown.rendering.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..ffdb1038184f50887ddf8c50e547ea40233869cb
+--- /dev/null
++++ b/packages/frontend/@n8n/design-system/src/components/N8nMarkdown/Markdown.rendering.test.ts
+@@ -0,0 +1,18 @@
++import { render } from '@testing-library/vue';
++import { performance } from 'node:perf_hooks';
++
++import N8nMarkdown from './Markdown.vue';
++import { n8nHtml } from '../../directives';
++
++describe('N8nMarkdown rendering', () => {
++	it('renders long mixed quote text within a bounded interval', () => {
++		const content = '"a '.repeat(64_000) + "b' ".repeat(64_000);
++		const start = performance.now();
++		const wrapper = render(N8nMarkdown, {
++			global: { directives: { n8nHtml } },
++			props: { content },
++		});
++		expect(wrapper.container.textContent?.length).toBeGreaterThan(300_000);
++		expect(performance.now() - start).toBeLessThan(5_000);
++	}, 15_000);
++});
+diff --git a/packages/frontend/editor-ui/src/app/__tests__/markdown-rendering.test.ts b/packages/frontend/editor-ui/src/app/__tests__/markdown-rendering.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f8aae775afac02d6c97d20a56a4684a3977c08a
+--- /dev/null
++++ b/packages/frontend/editor-ui/src/app/__tests__/markdown-rendering.test.ts
+@@ -0,0 +1,21 @@
++import { render } from '@testing-library/vue';
++import { performance } from 'node:perf_hooks';
++import VueMarkdown from 'vue-markdown-render';
++
++describe('Markdown wrapper rendering', () => {
++	it('renders mixed quote text with typography enabled', () => {
++		const source = '"a '.repeat(64_000) + "b' ".repeat(64_000);
++		const start = performance.now();
++		const result = render(VueMarkdown, { props: { source, options: { typographer: true } } });
++		expect(result.container.textContent?.length).toBeGreaterThan(300_000);
++		expect(performance.now() - start).toBeLessThan(5_000);
++	}, 15_000);
++
++	it('keeps raw script text and unsupported link protocols out of the document', () => {
++		const source = '<script>fixture</script> [fixture](javascript:fixture)';
++		const result = render(VueMarkdown, { props: { source } });
++		expect(result.container.querySelector('script')).toBeNull();
++		expect(result.container.querySelector('a[href^="javascript:"]')).toBeNull();
++		expect(result.container.textContent).toContain('<script>fixture</script>');
++	});
++});
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 75182537d50967f787bad7b1fafc4125f9ec8472..83d86b75566c91cf6a8f532c0efbe116ceea16f9 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -653,9 +653,6 @@ catalogs:
+     luxon:
+       specifier: 3.7.2
+       version: 3.7.2
+-    markdown-it:
+-      specifier: ^13.0.2
+-      version: 13.0.2
+     markdown-it-link-attributes:
+       specifier: ^4.0.1
+       version: 4.0.1
+@@ -946,6 +943,7 @@ catalogs:
+       version: 7.29.1
+ 
+ overrides:
++  markdown-it: 14.3.3
+   libphonenumber-js: npm:empty-npm-package@1.0.0
+   '@browserbasehq/stagehand': npm:empty-npm-package@1.0.0
+   sharp: npm:empty-npm-package@1.0.0
+@@ -5595,8 +5593,8 @@ importers:
+         specifier: catalog:frontend
+         version: 11.12.0
+       markdown-it:
+-        specifier: 'catalog:'
+-        version: 13.0.2
++        specifier: 14.3.3
++        version: 14.3.3
+       markdown-it-link-attributes:
+         specifier: 'catalog:'
+         version: 4.0.1
+@@ -5843,8 +5841,8 @@ importers:
+         specifier: 4.18.1
+         version: 4.18.1(patch_hash=81ead1b07fc8efda87bd2724dbd876ab49f4a0aa03f96c3770060b2ea47d9e0b)
+       markdown-it:
+-        specifier: 'catalog:'
+-        version: 13.0.2
++        specifier: 14.3.3
++        version: 14.3.3
+       markdown-it-emoji:
+         specifier: ^2.0.2
+         version: 2.0.2
+@@ -6879,8 +6877,8 @@ importers:
+         specifier: 'catalog:'
+         version: 3.7.2
+       markdown-it:
+-        specifier: 'catalog:'
+-        version: 13.0.2
++        specifier: 14.3.3
++        version: 14.3.3
+       markdown-it-footnote:
+         specifier: ^4.0.0
+         version: 4.0.0
+@@ -8212,8 +8210,8 @@ importers:
+         specifier: 'catalog:'
+         version: 3.3.3
+       markdown-it:
+-        specifier: 'catalog:'
+-        version: 13.0.2
++        specifier: 14.3.3
++        version: 14.3.3
+       ts-morph:
+         specifier: 'catalog:'
+         version: 27.0.2
+@@ -20480,8 +20478,8 @@ packages:
+   markdown-it-task-lists@2.1.1:
+     resolution: {integrity: sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==}
+ 
+-  markdown-it@13.0.2:
+-    resolution: {integrity: sha512-FtwnEuuK+2yVU7goGn/MJ0WBZMM9ZPgU9spqlFs7/A/pDIUNSOQZhUgOqYCficIuR2QaFnrt8LHqBWsbTAoI5w==}
++  markdown-it@14.3.3:
++    resolution: {integrity: sha512-L//tDAkjTjJCU6pBUSBTgs3Kg4InVaZuUZog/b6V12UKhcDQ7S78877ibbCanRExwPuYP1CZD7Gd2dxSy1GXRg==}
+     hasBin: true
+ 
+   markdown-table@3.0.4:
+@@ -20559,8 +20557,8 @@ packages:
+   mdn-data@2.23.0:
+     resolution: {integrity: sha512-786vq1+4079JSeu2XdcDjrhi/Ry7BWtjDl9WtGPWLiIHb2T66GvIVflZTBoSNZ5JqTtJGYEVMuFA/lbQlMOyDQ==}
+ 
+-  mdurl@1.0.1:
+-    resolution: {integrity: sha512-/sKlQJCBYVY9Ers9hqzKou4H6V5UWc/M59TH2dvkt+84itfnq7uFOMLpOiOS4ujvHP4etln18fmIxA5R5fll0g==}
++  mdurl@2.1.0:
++    resolution: {integrity: sha512-1+HBaOx0zi/dQWht8rNv9MYf9qqpqL/kxI0hXImU6Y547zM6Sni8BQibt7ifgMcYtQg41ao3Ivd6cnSM86inpg==}
+ 
+   media-typer@0.3.0:
+     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
+@@ -39644,13 +39642,14 @@ snapshots:
+ 
+   markdown-it-task-lists@2.1.1: {}
+ 
+-  markdown-it@13.0.2:
++  markdown-it@14.3.3:
+     dependencies:
+       argparse: 2.0.1
+-      entities: 3.0.1
++      entities: 4.5.0
+       linkify-it: 5.0.2
+-      mdurl: 1.0.1
+-      uc.micro: 1.0.6
++      mdurl: 2.1.0
++      punycode.js: 2.3.1
++      uc.micro: 2.1.0
+ 
+   markdown-table@3.0.4: {}
+ 
+@@ -39785,7 +39784,7 @@ snapshots:
+ 
+   mdn-data@2.23.0: {}
+ 
+-  mdurl@1.0.1: {}
++  mdurl@2.1.0: {}
+ 
+   media-typer@0.3.0: {}
+ 
+@@ -45020,7 +45019,7 @@ snapshots:
+ 
+   vue-markdown-render@2.2.1(vue@3.5.26(typescript@6.0.2)):
+     dependencies:
+-      markdown-it: 13.0.2
++      markdown-it: 14.3.3
+       vue: 3.5.26(typescript@6.0.2)
+ 
+   vue-observe-visibility@2.0.0-alpha.1(vue@3.5.26(typescript@6.0.2)):
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index a826f89ddce338716a1aa5ab1a8d2f4479d4bcdb..cf9c125bf9824ae40845313f348e95f56f5a0433 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -233,7 +233,7 @@ catalog:
+   lodash-es: 4.18.1
+   lru-cache: 11.5.1
+   luxon: 3.7.2
+-  markdown-it: ^13.0.2
++  markdown-it: 14.3.3
+   markdown-it-link-attributes: ^4.0.1
+   mime-types: 3.0.2
+   moment-timezone: 0.5.48
+@@ -366,6 +366,7 @@ catalogs:
+     zod: ^4.4.3
+ 
+ overrides:
++  markdown-it: 14.3.3
+   libphonenumber-js: npm:empty-npm-package@1.0.0
+   '@browserbasehq/stagehand': npm:empty-npm-package@1.0.0
+   sharp: npm:empty-npm-package@1.0.0
