@@ -46,48 +46,58 @@ production or external services. Production credentials/content stay outside
 this repository. Restore testing does not authorize restoring an older dump
 over newer production writes: stop writers and assess data compatibility first.
 
-## Remaining vendor dependencies
+## Focused dependency maintenance
 
-This is an upstream application and runtime security patch, **not a clean
-production dependency audit**. The installed production graph for this image
-still has195 applicable package/advisory pairs:3critical,90high,80moderate,
-22low (snapshot2026-10-24). These counts identify installed dependencies,
-not proof of reachable exploits. Remaining critical packages are tar6.2.1, passport-saml3.2.4 and
-simple-git3.33.0 (the trailer-command advisory). Assess focused
-compatible fixes separately with provider and rendering regression checks;
-do not use blind force-upgrades or change feature majors in production.
+Nine exact vendor paths are replaced with pinned package versions. The earlier
+same-major multipart/underscore/Babel fixes remain. Three explicitly validated
+major migrations now replace tar 6.2.1 with 7.5.22, simple-git 3.30.0 with 4.0.2,
+and unscoped passport-saml 3.2.4 with @node-saml/passport-saml 5.1.1. The lockfile
+includes complete helper dependency resolution; the vendor tree and native
+binaries are not reinstalled. Guards reject any unexpected old version, package
+name or unapproved major transition.
 
-## Focused compatible dependency fixes
+Git 4 exports a named factory and rejects core.sshCommand by default. The
+pinned Wiki adapter is patched at its exact expected import/factory expressions.
+Only SSH-authenticated storage enables the SSH-command exception needed by its
+existing administrator-controlled key configuration. Protocol/trailer guards
+remain enabled. `verify-git-storage.cjs` exercises the actual Wiki adapter with
+local HTTP Basic and SSH transport fixtures: initialization, raw configuration,
+key command construction, remote setup, pull/rebase/diff and push/force modes.
+Trailer-command and unsafe-protocol configuration are rejected. The SSH fixture
+replaces the transport command with a temporary local Git server; it never uses
+real keys or a remote host. Run with no external network. Its HTTP fixture needs
+Alpine git-daemon's git-http-backend in the test image.
 
-The recipe replaces seven verified package paths using same-major versions:
-form-data2.3.3→2.5.6,3.0.0→3.0.5,4.0.0→4.0.6; underscore1.8.3/1.6.0→1.13.8;
-Babel traverse7.12.13→7.29.8; simple-git3.30.0→3.33.0. Most safe targets already
-exist in the pinned vendor image. Only the remaining form-data3 and simple-git3
-packages are installed in a separate build stage, with their full dependency
-lockfile; the vendor dependency tree is not reinstalled. The application,
-database, provider settings and native binaries remain otherwise unchanged.
+Scoped SAML uses idpCert rather than cert and a separate logout verifier. The
+adapter preserves existing Wiki configuration field names, mappings and local
+authentication. Signed-assertion-only responses remain supported as in 3.x;
+valid signature verification remains mandatory. Audience validation remains
+controlled by the existing audience field, matching 3.x behavior. If supplied,
+idpIssuer additionally checks the authenticated issuer. Logout only acknowledges
+the matching provider/current user; it does not create a new user. Existing
+inactive providers stay inactive; no production IdP settings are modified.
 
-`compatible-replacements.json` records exact expected old paths/versions and
-replacement paths/versions. The application build refuses an unexpected vendor
-layout, package name or cross-major replacement. Symlinks retain each module's
-complete dependency resolution context. Audit the resulting installed graph,
-not only the vendor's original dependency declarations.
+`verify-saml.cjs` generates an ephemeral certificate and signed SAML messages,
+then runs the actual adapter: sign-on, profile/group mapping, signed assertion
+compatibility and sign-out. Tampered/unsigned messages, incorrect configured
+issuer/audience and a mismatched logout user are rejected. It requires openssl
+only in the isolated test image. Fixtures never contain real IdP keys.
 
-Run `verify-compatible.cjs` inside the image with no outbound network. It checks
-all replacements, multipart API/cryptographic boundaries, underscore/template
-compatibility, Babel and GraphQL imports, native modules, local Git operations
-and the case-insensitive unsafe protocol guard. Full isolated application
-login/content/permissions and the first-party security regressions must also pass.
+`verify-native.Dockerfile` compiles the vendor sqlite3 source against the exact
+Node 24 headers and patched tar extraction, then performs SQLite read/write.
+The vendor's old node-gyp needs Python setuptools in the test toolchain. Compiler
+packages and rebuilt test binaries do not enter the deployed application.
 
-A tested latest3.x Git candidate3.36.0 introduced a known critical issue in its
-new argv-parser dependency. It was rejected;3.33.0 fixes the case-insensitive
-protocol vulnerability without adding that parser. The remaining trailer-command
-fix requires4.0.1+, tar's resource-limit fix requires7.5.19+, and the abandoned
-passport-saml3 package has no patched release (the replacement scoped provider
-requires5.1.0+). Those need separate API/provider compatibility work, not forced
-major replacements. The inspected live site uses local authentication and no
-active storage provider, but dormant installed dependencies remain tracked.
+Run `verify-compatible.cjs` without external network for pinned path versions,
+multipart crypto/API, underscore, Babel/GraphQL, native loads and Git guards.
+Also restore the isolated database and repeat login/content/permissions and
+first-party security regressions before production rollout. Clones must have
+no outbound access and must retain only synthetic signing keys/credentials.
 
-The focused changes reduce the same vendor graph from202 to195 package/advisory
-pairs and critical pairs from7 to3, with no newly introduced advisory pair.
-This remains a partial dependency remediation, not a clean audit.
+The installed production dependency graph audit is **not clean**: 163 distinct
+package/advisory pairs remain (0 critical, 66 high, 75 moderate, 22 low;
+2026-10-24 snapshot). This follow-up removes 32 pairs from the previously accepted
+195-pair graph, introduces zero pairs, and removes all three critical findings.
+Remaining legacy high/moderate/low dependencies need focused follow-up rather
+than blind force upgrades. Counts include installed dormant providers and are
+not proof of publicly reachable exploits.

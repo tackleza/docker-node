@@ -38,7 +38,22 @@
   {
     "path": "/wiki/node_modules/simple-git",
     "expected": "3.30.0",
-    "target": "/opt/wiki-security-deps/node_modules/simple-git-v3",
-    "version": "3.33.0"
+    "target": "/opt/wiki-security-deps/node_modules/simple-git-v4",
+    "version": "4.0.2",
+    "validatedMajorMigration": "Wiki storage Git integration fixture"
+  },
+  {
+    "path": "/wiki/node_modules/tar",
+    "expected": "6.2.1",
+    "target": "/opt/wiki-security-deps/node_modules/tar-v7",
+    "version": "7.5.22",
+    "validatedMajorMigration": "sqlite3 native installer and tar archive fixture"
+  },
+  {
+    "path": "/wiki/node_modules/passport-saml",
+    "expected": "3.2.4",
+    "target": "/opt/wiki-security-deps/node_modules/passport-saml-v5",
+    "version": "5.1.1",
+    "validatedMajorMigration": "Wiki SAML adapter signed login/logout/group and negative assertion fixtures"
   }
 ]

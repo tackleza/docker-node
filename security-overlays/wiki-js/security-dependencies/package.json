@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "form-data-v3": "npm:form-data@3.0.5",
-    "simple-git-v3": "npm:simple-git@3.33.0"
+    "tar-v7": "npm:tar@7.5.22",
+    "simple-git-v4": "npm:simple-git@4.0.2",
+    "passport-saml-v5": "npm:@node-saml/passport-saml@5.1.1"
   }
 }
