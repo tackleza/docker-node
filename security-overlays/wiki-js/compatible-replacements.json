@@ -1,0 +1,44 @@
+[
+  {
+    "path": "/wiki/node_modules/form-data",
+    "expected": "2.3.3",
+    "target": "/wiki/node_modules/superagent/node_modules/form-data",
+    "version": "2.5.6"
+  },
+  {
+    "path": "/wiki/node_modules/@graphql-tools/links/node_modules/form-data",
+    "expected": "3.0.0",
+    "target": "/opt/wiki-security-deps/node_modules/form-data-v3",
+    "version": "3.0.5"
+  },
+  {
+    "path": "/wiki/node_modules/@graphql-tools/url-loader/node_modules/form-data",
+    "expected": "4.0.0",
+    "target": "/wiki/node_modules/axios/node_modules/form-data",
+    "version": "4.0.6"
+  },
+  {
+    "path": "/wiki/node_modules/express-brute/node_modules/underscore",
+    "expected": "1.8.3",
+    "target": "/wiki/node_modules/underscore",
+    "version": "1.13.8"
+  },
+  {
+    "path": "/wiki/node_modules/passport-cas/node_modules/underscore",
+    "expected": "1.6.0",
+    "target": "/wiki/node_modules/underscore",
+    "version": "1.13.8"
+  },
+  {
+    "path": "/wiki/node_modules/@graphql-tools/graphql-tag-pluck/node_modules/@babel/traverse",
+    "expected": "7.12.13",
+    "target": "/wiki/node_modules/@babel/traverse",
+    "version": "7.29.8"
+  },
+  {
+    "path": "/wiki/node_modules/simple-git",
+    "expected": "3.30.0",
+    "target": "/opt/wiki-security-deps/node_modules/simple-git-v3",
+    "version": "3.33.0"
+  }
+]

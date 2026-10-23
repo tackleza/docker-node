@@ -1,0 +1,9 @@
+{
+  "name": "wiki-compatible-security-dependencies",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "form-data-v3": "npm:form-data@3.0.5",
+    "simple-git-v3": "npm:simple-git@3.33.0"
+  }
+}
