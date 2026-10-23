@@ -30,7 +30,13 @@ try:
  else:raise RuntimeError('Candidate Kuma health acceptance failed')
  d['protected_config_after']=json.loads(run(['docker','exec',name,'node','-e',(ops/'kuma-protected-config.cjs').read_text(),'/app/data/kuma.db']))
  assert d['protected_config_after']==d['protected_config_before'],'Monitor/user/notification/settings content changed'
- assert run(['curl','--fail','--silent','--show-error','--location','--max-time','20','--output','/dev/null','--write-out','%{http_code}','https://status.sk-mc.net/']).decode()=='200'
+ d['public_statuses']=[]
+ for attempt in range(15):
+  probe=subprocess.run(['curl','--silent','--show-error','--location','--max-time','10','--output','/dev/null','--write-out','%{http_code}','https://status.sk-mc.net/'],capture_output=True,text=True)
+  d['public_statuses'].append({'exit':probe.returncode,'http':probe.stdout if probe.stdout.isdigit() else 'invalid'});save()
+  if probe.returncode==0 and probe.stdout=='200':break
+  time.sleep(3)
+ else:raise RuntimeError('Public readiness failed after Docker DNS resolver grace')
  d['versions']=json.loads(run(['docker','exec',name,'node','-e',"console.log(JSON.stringify({node:process.version,application:require('/app/package.json').version,protobuf:require('/app/node_modules/protobufjs/package.json').version,tar:require('/app/node_modules/tar/package.json').version,nodemailer:require('/app/node_modules/nodemailer/package.json').version}))"]))
  d['status']='accepted_pending_full_dependency_audit';save();print(json.dumps(d))
 except Exception:
