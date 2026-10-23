@@ -50,9 +50,44 @@ over newer production writes: stop writers and assess data compatibility first.
 
 This is an upstream application and runtime security patch, **not a clean
 production dependency audit**. The installed production graph for this image
-still has202 applicable package/advisory pairs:7critical,93high,80moderate,
+still has195 applicable package/advisory pairs:3critical,90high,80moderate,
 22low (snapshot2026-10-24). These counts identify installed dependencies,
-not proof of reachable exploits. Remaining critical packages include form-data,
-underscore, tar, Babel traverse, passport-saml and simple-git. Assess focused
+not proof of reachable exploits. Remaining critical packages are tar6.2.1, passport-saml3.2.4 and
+simple-git3.33.0 (the trailer-command advisory). Assess focused
 compatible fixes separately with provider and rendering regression checks;
 do not use blind force-upgrades or change feature majors in production.
+
+## Focused compatible dependency fixes
+
+The recipe replaces seven verified package paths using same-major versions:
+form-data2.3.3→2.5.6,3.0.0→3.0.5,4.0.0→4.0.6; underscore1.8.3/1.6.0→1.13.8;
+Babel traverse7.12.13→7.29.8; simple-git3.30.0→3.33.0. Most safe targets already
+exist in the pinned vendor image. Only the remaining form-data3 and simple-git3
+packages are installed in a separate build stage, with their full dependency
+lockfile; the vendor dependency tree is not reinstalled. The application,
+database, provider settings and native binaries remain otherwise unchanged.
+
+`compatible-replacements.json` records exact expected old paths/versions and
+replacement paths/versions. The application build refuses an unexpected vendor
+layout, package name or cross-major replacement. Symlinks retain each module's
+complete dependency resolution context. Audit the resulting installed graph,
+not only the vendor's original dependency declarations.
+
+Run `verify-compatible.cjs` inside the image with no outbound network. It checks
+all replacements, multipart API/cryptographic boundaries, underscore/template
+compatibility, Babel and GraphQL imports, native modules, local Git operations
+and the case-insensitive unsafe protocol guard. Full isolated application
+login/content/permissions and the first-party security regressions must also pass.
+
+A tested latest3.x Git candidate3.36.0 introduced a known critical issue in its
+new argv-parser dependency. It was rejected;3.33.0 fixes the case-insensitive
+protocol vulnerability without adding that parser. The remaining trailer-command
+fix requires4.0.1+, tar's resource-limit fix requires7.5.19+, and the abandoned
+passport-saml3 package has no patched release (the replacement scoped provider
+requires5.1.0+). Those need separate API/provider compatibility work, not forced
+major replacements. The inspected live site uses local authentication and no
+active storage provider, but dormant installed dependencies remain tracked.
+
+The focused changes reduce the same vendor graph from202 to195 package/advisory
+pairs and critical pairs from7 to3, with no newly introduced advisory pair.
+This remains a partial dependency remediation, not a clean audit.
