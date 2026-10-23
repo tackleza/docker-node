@@ -7,19 +7,52 @@
 
 A lightweight Node.js Docker image based on Alpine Linux, with **pnpm** pre-installed globally on all variants.
 
-## Available Tags
+## Support and security status
 
-| Tag | Node.js Version |
-|-----|----------------|
-| `20-alpine` | Node.js 20 |
-| `21-alpine` | Node.js 21 |
-| `22-alpine` | Node.js 22 |
-| `23-alpine` | Node.js 23 |
-| `24-alpine` | Node.js 24 |
-| `25-alpine` | Node.js 25 |
-| `latest` | Node.js 25 |
+**Checked 2026-10-23. Do not use the EOL tags for new builds or production.**
+Node.js 20, 21, 23, and 25 have reached end of life and no longer receive
+upstream Node.js security patches. Rebuilding an image or running `apk upgrade`
+does not fix vulnerabilities in an unsupported Node.js runtime. Migrate those
+applications to a supported LTS release and test compatibility.
 
-All images are based on the official `node:<version>-alpine` images.
+| Tag / source directory | Dockerfile base | Upstream status | Required action |
+|---|---|---|---|
+| `20-alpine` | `node:20-alpine` | **EOL — no Node.js security patches** | Migrate to patched Node 22 or 24 LTS |
+| `21-alpine` | `node:21-alpine` | **EOL — no Node.js security patches** | Migrate to patched Node 22 or 24 LTS |
+| `22-alpine` | `node:22-alpine` | Maintenance LTS | Rebuild with Node **22.23.4 or newer** security release |
+| `23-alpine` | `node:23-alpine` | **EOL — no Node.js security patches** | Migrate to patched Node 24 LTS |
+| `24-alpine` | `node:24-alpine` | Active LTS | Rebuild with Node **24.22.1 or newer** security release |
+| `25-alpine` | `node:25-alpine` | **EOL — no Node.js security patches** | Migrate to patched Node 24 LTS |
+| `latest` | `node:24-alpine` | Active LTS (Node 24) | Rebuild with Node **24.22.1 or newer** security release; prefer an explicit major tag |
+
+These are source definitions, **not verification of the currently published
+Docker Hub images**. Floating tags do not update an existing local image,
+application image, or running container automatically. The October 21, 2026
+Node.js security release fixes high-severity issues including a Brotli decoder
+out-of-bounds write that permits remote code execution. Treat older runtimes,
+including EOL releases, as requiring remediation.
+
+For supported variants, fetch the current base (`docker build --pull`), verify
+`node --version` in the resulting image, publish through the established image
+workflow, then rebuild and redeploy dependent applications. Verify the actual
+runtime inside each deployed container; changing `package.json` engines or
+pulling a base image alone does not patch a running application. Preserve a
+rollback image digest before deployment.
+
+### Automation limitations found in this audit
+
+The checked-in workflow watches only the digest of `node:latest`; that does not
+reliably track security updates to the Node 22 and 24 Alpine bases used here.
+The local `build-all.sh` still includes EOL variants and does not build the
+`latest/` directory. Its presence is not a promise of continuing security
+support for those EOL tags. Review supported-base detection, explicit pulls,
+and all consumers before publishing replacement shared tags.
+
+Official sources:
+
+- [Node.js release status and support schedule](https://nodejs.org/en/about/previous-releases)
+- [Node.js end-of-life guidance](https://nodejs.org/en/about/eol)
+- [October 21, 2026 security releases and fixed versions](https://nodejs.org/en/blog/vulnerability/october-2026-security-releases)
 
 ## What's Included
 
