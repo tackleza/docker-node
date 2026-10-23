@@ -1,0 +1,4 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+function digest(root){const h=crypto.createHash('sha256');let files=0;function walk(rel){const full=path.join(root,rel),s=fs.lstatSync(full);h.update(JSON.stringify([rel,s.mode,s.uid,s.gid,s.isSymbolicLink()?'link':s.isDirectory()?'dir':s.isFile()?'file':'other']));if(s.isSymbolicLink())h.update(fs.readlinkSync(full));else if(s.isDirectory())for(const n of fs.readdirSync(full).sort())walk(path.join(rel,n));else if(s.isFile()){h.update(fs.readFileSync(full));files++;}}walk('');return {files,sha256:h.digest('hex')};}
+const [a,b]=process.argv.slice(2);const x=digest(a),y=digest(b);if(x.sha256!==y.sha256||x.files!==y.files)throw new Error('Restored tree does not match source contents/ownership/modes');console.log(JSON.stringify({ok:true,files:x.files,sha256:x.sha256}));

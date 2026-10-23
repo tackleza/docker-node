@@ -1,0 +1,12 @@
+{
+  "package": "node-red-node-email",
+  "upstream_version": "3.1.0",
+  "upstream_tarball": "https://registry.npmjs.org/node-red-node-email/-/node-red-node-email-3.1.0.tgz",
+  "upstream_integrity": "sha512-QC+fZz4mMTQ1rZ8LT1WC38gr+muaN/YV0OBlTlrXEOf0zbXaw5JraN02XL7vcArLOBw5hdVJEjwYw4LyqrxznQ==",
+  "upstream_sha256": "82a79d07f859a5b771b702917f864f47cea999e8e7142bd3eaa37927dc3ba028",
+  "local_sha256": "5f5a450a2d2f2a4d57535b61626488de9f8a4f5339c29475e5ca05501b5b5c72",
+  "changes": [
+    "Remove bundled dependency directories and bundleDependencies declaration so reviewed root overrides can resolve patched dependencies",
+    "Version metadata 3.1.0-security.1; runtime JS/HTML and licenses unchanged"
+  ]
+}
