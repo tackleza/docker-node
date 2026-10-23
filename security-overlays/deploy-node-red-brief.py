@@ -2,7 +2,7 @@
 """SVD01 two-phase deployment: prepare immutable deps online; brief gated cutover.
 Never execute cutover without coordinator's explicit application-stop gate.
 """
-import json,subprocess,pathlib,sys,time,hashlib,urllib.request
+import json,subprocess,pathlib,sys,time,hashlib,urllib.request,tarfile
 mode,image,new_image,revision,old_lock,*extra=sys.argv[1:]
 old_image='sha256:1c532f9dd00d6f77750bb2a9fedcdbb3f178ca6e539cbefb66084494d9e568d6'
 old_ref='nodered/node-red@sha256:e085d4a06591fd0aca2ea2a91364d27f1a0e31e885675f77935e10f95412a963'
@@ -22,6 +22,10 @@ def preflight():
 def tree(a,b,source,target,state=False):
  m=mounts(**{'/source':(source,True),'/restore':(target,True),'/verify-tree.cjs':(ops/'verify-tree.cjs',True)})
  return json.loads(run(helper('node',['/verify-tree.cjs',a,b]+(['--state-only'] if state else []),m)))
+def repair_link_owners(archive,target):
+ with tarfile.open(archive,'r:gz') as tf: entries=[{'path':m.name,'uid':m.uid,'gid':m.gid} for m in tf if m.issym()]
+ manifest=root/('link-owners-'+str(time.time_ns())+'.json');manifest.write_text(json.dumps(entries));manifest.chmod(0o600)
+ return json.loads(run(helper('node',['/restore-tar-link-owners.cjs','/restore','/links.json'],mounts(**{'/restore':(target,False),'/links.json':(manifest,True),'/restore-tar-link-owners.cjs':(ops/'restore-tar-link-owners.cjs',True)}))))
 def save(p,d):p.write_text(json.dumps(d,indent=2));p.chmod(0o600)
 def protected():
  code="const fs=require('fs'),h=require('crypto').createHash('sha256');let files=fs.readdirSync('/data').filter(x=>/^flows.*\\.json$/.test(x)||x==='settings.js'||x==='.config.runtime.json').sort();for(const f of files){h.update(f);h.update(fs.readFileSync('/data/'+f));}console.log(JSON.stringify({count:files.length,sha256:h.digest('hex')}));"
@@ -31,12 +35,14 @@ if mode=='prepare':
  preflight();archive=pathlib.Path(extra[0]).resolve();assert archive.is_relative_to(root) and archive.is_file()
  # Reading immutable module files needs no service stop; no palette install may
  # run concurrently. The source lock is revalidated before and after preparation.
- restore=root/('dependency-restore-'+revision);restore.mkdir(mode=0o700)
+ restore=root/('dependency-restore-'+revision);restore.mkdir(mode=0o700,exist_ok=True)
  run(helper('tar',['xzf','/backup/'+archive.name,'-C','/restore','./node_modules','./package.json','./package-lock.json'],mounts(**{'/backup':(root,True),'/restore':(restore,False)})))
+ repair_link_owners(archive,restore)
  checked=tree('/source','/restore',data/'node_modules',restore/'node_modules')
  assert hashlib.sha256((restore/'package-lock.json').read_bytes()).hexdigest()==old_lock
  artifact=root/('dependencies-'+revision+'.tar.gz');assert artifact.is_file();assert not stage.exists()
  run(helper('sh',['-c','mkdir /data/.security-stage-'+revision+' && tar xzf /backup/'+artifact.name+' -C /data/.security-stage-'+revision],mounts(**{'/data':(data,False),'/backup':(root,True)})))
+ repair_link_owners(artifact,stage)
  # Compare candidate staged module bytes/modes/owners with the immutable image.
  new_checked=json.loads(run(helper('node',['/verify-tree.cjs','/opt/flow-dependencies/node_modules','/stage/node_modules'],mounts(**{'/stage':(stage,True),'/verify-tree.cjs':(ops/'verify-tree.cjs',True)}))))
  preflight();save(prepared,{'status':'online_dependencies_restored_verified_candidate_staged','revision':revision,'image':new_image,'old_image':old_image,'old_lock_sha256':old_lock,'dependency_archive':str(archive),'dependency_archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'dependency_restore':str(restore),'old_dependency_tree':checked,'candidate_stage':str(stage),'candidate_tree':new_checked,'new_lock_sha256':hashlib.sha256((stage/'package-lock.json').read_bytes()).hexdigest(),'note':'Preparatory archive is used for verified immutable dependencies only. Mutable state gets its own final brief cold backup.'});print(json.dumps(json.load(open(prepared))))
@@ -51,6 +57,7 @@ elif mode=='cutover':
    run(helper('tar',['czf','-','--exclude=./node_modules','--exclude=./.npm','--exclude=./.cache','--exclude=./.security-*','-C','/source','.'],mounts(**{'/source':(data,True)})),stdout=out)
   backup.chmod(0o600);restore.mkdir(mode=0o700)
   run(helper('tar',['xzf','/backup/'+backup.name,'-C','/restore'],mounts(**{'/backup':(root,True),'/restore':(restore,False)})))
+  d['mutable_link_owners_restored']=repair_link_owners(backup,restore)
   d['mutable_restore_verified']=tree('/source','/restore',data,restore,state=True);d['mutable_backup_sha256']=hashlib.sha256(backup.read_bytes()).hexdigest();d['status']='brief_cold_state_verified';save(record,d)
   script="""set -eu
 for f in node_modules package.json package-lock.json vendor; do test ! -e /data/.security-before-REV-$f; done

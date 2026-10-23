@@ -63,3 +63,10 @@ dependency directories remain untouched for immediate rollback.
 `../verify-tree-test.cjs` checks full restores, allowed state-only exclusions,
 protected flow tampering and permission differences. The original full-cold
 helper remains available for quiet hosts; do not retry an unknown execution.
+
+BusyBox tar restores regular-file owners but can leave symlink inodes root-owned.
+The brief helper reapplies numeric symlink UID/GID from the archive with
+`fs.lchownSync`, validates that the parent resolves inside the owned restore tree,
+and never follows the symlink target. Tests reject absolute/escaping paths and
+symlink ancestors outside the restore root. Exact owner/mode/content validation
+then remains strict; differences are not waived.
