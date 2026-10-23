@@ -11,7 +11,7 @@ for (const change of changes) {
   assert.equal(target.name, current.name === 'passport-saml' ? '@node-saml/passport-saml' : current.name, 'Replacement package name differs')
   assert.equal(target.version, change.version, 'Replacement package version differs')
   if (target.version.split('.')[0] !== current.version.split('.')[0]) {
-    const migrations = { 'simple-git': ['3.30.0', '4.0.2'], tar: ['6.2.1', '7.5.22'], 'passport-saml': ['3.2.4', '5.1.1'] }
+    const migrations = { 'simple-git': ['3.30.0', '4.0.2'], tar: ['6.2.1', '7.5.22'], 'passport-saml': ['3.2.4', '5.1.1'], multer: ['1.4.4', '2.5.0'], 'node-fetch': ['1.7.3', '2.7.0'] }
     assert.deepEqual([current.version, target.version], migrations[current.name], 'Unvalidated major migration refused')
     assert(change.validatedMajorMigration)
   }

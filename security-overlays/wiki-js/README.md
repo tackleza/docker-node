@@ -94,10 +94,76 @@ Also restore the isolated database and repeat login/content/permissions and
 first-party security regressions before production rollout. Clones must have
 no outbound access and must retain only synthetic signing keys/credentials.
 
-The installed production dependency graph audit is **not clean**: 163 distinct
-package/advisory pairs remain (0 critical, 66 high, 75 moderate, 22 low;
-2026-10-24 snapshot). This follow-up removes 32 pairs from the previously accepted
-195-pair graph, introduces zero pairs, and removes all three critical findings.
-Remaining legacy high/moderate/low dependencies need focused follow-up rather
-than blind force upgrades. Counts include installed dormant providers and are
-not proof of publicly reachable exploits.
+The installed production dependency graph audit is **not clean**: 90 distinct
+package/advisory pairs remain (0 critical, 28 high, 52 moderate, 10 low;
+2026-10-24 snapshot). This active-path follow-up removes 73 pairs from the prior
+163-pair graph, including 38 high findings, and introduces zero advisory pairs.
+
+## Active HTTP, authentication and rendering follow-up
+
+The recipe now guards 33 paths. Maintained-series updates include Express4.22.3,
+body-parser1.20.9, compression1.8.2, Apollo Server/Express2.26.2, DOMPurify3.4.17,
+lodash4.18.1, YAML3.15.2, JSON5 2.2.3, Luxon1.28.1, nanoid3.3.20, ws7.5.13,
+immutable3.8.4, tar-fs2.1.5, cache semantics4.3.0, node-fetch2.7.0,
+mysql2 3.24.6 and node-uuid1.4.8. Existing WebSocket5 paths are preserved.
+Multer2.5.0 retains the application's disk destination and `.array` upload API;
+real authenticated PNG upload/storage and malformed multipart tests pass.
+
+The helper Apollo packages share the vendor GraphQL15.3.0 instance to preserve
+schema identity; Express's dynamically loaded Pug engine resolves to the same
+vendor Pug implementation. This does not change application engines, secrets
+or configuration. Normal forms/JSON, parameter/depth rejection, compression,
+login/content/authorization, root-account protections and native checks pass.
+Playground remains available with its fixed1.7.42 client; its actual HTTP HTML
+is checked rather than inferring browser security from server package versions.
+
+DOMPurify3.3.1 was embedded in the shipped webpack vendor artifact. The recipe
+parses and guards its exact original SHA256/module ID, replaces the single
+self-contained factory with the official3.4.17 CommonJS distribution, parses
+the resulting JavaScript and updates entry-template/runtime cache keys using
+the new artifact hash. The vendor module ID and other modules remain intact.
+`verify-browser.cjs` executes the actual resulting factory against DOM fixtures,
+checks detached-parent/sibling hooks, normal HTML and XSS removal, verifies the
+actual HTTP-delivered vendor hash and entry/chunk cache keys. Vulnerable lodash
+template/full-library modules are absent from the inspected browser bundle.
+
+## Remaining high migration boundaries
+
+The audit still counts dormant provider packages. No provider was removed or
+activated to improve these counts. Production has only local authentication,
+no storage provider and no SMTP host. Markdown rendering is enabled with
+linkification; typography is currently disabled.
+
+- Knex0.21 is active in database/session code. Objection2.2.18 explicitly peers
+  on Knex<0.95; a clean install with patchedKnex2.4.0 fails ERESOLVE. This requires
+  an ORM/session migration, not a same-series replacement. PostgreSQL and all
+  existing application schema/data stay unchanged here.
+- GraphQL Tools utility7/8/9 releases have no same-series patch. Patched12.0.1
+  no longer exports SchemaDirectiveVisitor, which Wiki's authorization directive
+  extends; latest13 additionally requires GraphQL16+ while Wiki uses15.3.0.
+  Migration must preserve the directive authorization model and subscriptions.
+- Markdown11 and linkify3 are compiled into editor/footer browser modules as
+  well as server renderers/comments. Fix boundaries are Markdown14.3.2+ and
+  linkify5.0.2+. A coordinated renderer/plugin and browser module rebuild is
+  required; changing a server package alone leaves the client artifact affected.
+  This is a remaining migration task, not a claim that current majors were
+  tested and proved impossible. Smartquotes' typography precondition is absent
+  from the current server config; linkification remains enabled.
+- Cheerio's css-what4 needs5.0.1+ in its css-select3 parser stack. Call sites
+  inspected use application-defined selectors, not a public arbitrary-selector
+  endpoint. Changing parser/token contracts needs a coordinated selector-stack
+  migration. Installed findings remain counted.
+- Optional legacy Azure HTTP/auth, SSH proxy, mail and unused file inspection
+  APIs retain old axios0.21/ip-address5/nodemailer6/file-type15/
+  image-size0.9. Their patch boundaries span dependency/API majors. Dicer and
+  node-forge currently have no patched published release for their findings.
+  These installed packages remain documented even when their provider is off.
+- The residual Apollo standalone-server advisory is counted by version range;
+  Wiki invokes the Express integration and does not export/use the affected
+  startStandaloneServer API. Its Playground XSS finding is patched and tested.
+
+Full per-advisory path classification and official fixed-version evidence are
+retained in the session's private operational report. Remaining high/moderate/
+low findings require follow-up; the image is not an audit-clean application.
+
+Legacy Apollo-fetch now resolves patched node-fetch2.7.0 for its previous1.7.3 copy. The actual client query/variables/response contract and cross-origin credential stripping are tested against disposable local servers. Localization/update/telemetry behavior is preserved; no real outbound job is triggered during clone tests.
