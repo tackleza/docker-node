@@ -43,11 +43,13 @@ try:
   if k=='Labels':
    expected_labels={**(newimg['Config'].get('Labels') or {}),**(v or {})}
    if now['Config'].get(k)!=expected_labels:differences.append('Config.Labels')
+  elif k=='User' and v in ['', 'root', '0', '0:0', 'root:root'] and now['Config'].get(k) in ['', 'root', '0', '0:0', 'root:root']:
+   if now['Config'].get(k)!=v:record['equivalent_root_user_forms']=True
   elif k not in ['Image'] and now['Config'].get(k)!=v:differences.append('Config.'+k)
  for k in ['Binds','Mounts','PortBindings','RestartPolicy','NetworkMode','Privileged','CapAdd','CapDrop','SecurityOpt','Devices','ExtraHosts','Dns','ReadonlyRootfs','GroupAdd']:
   if old['HostConfig'].get(k)!=now['HostConfig'].get(k):differences.append('HostConfig.'+k)
  if differences:raise RuntimeError('Unexpected recreated configuration differences: '+', '.join(differences))
- print(json.dumps(record))
+ save();print(json.dumps(record))
 except Exception:
  record['status']='failed_rolling_back';save()
  if created:
