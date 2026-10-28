@@ -9,7 +9,7 @@ A lightweight Node.js Docker image based on Alpine Linux, with **pnpm** pre-inst
 
 ## Support and security status
 
-**Checked 2026-10-23. Do not use the EOL tags for new builds or production.**
+**Checked 2026-10-28. Do not use the EOL tags for new builds or production.**
 Node.js 20, 21, 23, and 25 have reached end of life and no longer receive
 upstream Node.js security patches. Rebuilding an image or running `apk upgrade`
 does not fix vulnerabilities in an unsupported Node.js runtime. Migrate those
@@ -39,14 +39,19 @@ runtime inside each deployed container; changing `package.json` engines or
 pulling a base image alone does not patch a running application. Preserve a
 rollback image digest before deployment.
 
-### Automation limitations found in this audit
+### Supported image builds
 
-The checked-in workflow watches only the digest of `node:latest`; that does not
-reliably track security updates to the Node 22 and 24 Alpine bases used here.
-The local `build-all.sh` still includes EOL variants and does not build the
-`latest/` directory. Its presence is not a promise of continuing security
-support for those EOL tags. Review supported-base detection, explicit pulls,
-and all consumers before publishing replacement shared tags.
+`sh build-supported.sh` builds and smoke-tests `22-alpine`, `24-alpine`, and
+`latest` without publishing. It pulls the current base for each build, and the
+Dockerfiles reject runtimes older than 22.23.4 / 24.22.1 in their respective
+major release lines. All three images must build and pass the Node/pnpm checks
+before `sh build-supported.sh --push` publishes any tag. A single variant can
+be selected, for example `sh build-supported.sh 22-alpine`.
+
+CI runs this supported build and publish workflow daily, on pushes, and on
+manual dispatch. It pulls each supported Alpine base directly on every run;
+it does not depend on `node:latest` digest changes. The legacy `build-all.sh`
+and EOL directories remain for historical use and are excluded from CI.
 
 Official sources:
 
